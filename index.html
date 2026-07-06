@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8"/>
@@ -16,7 +16,204 @@
         <link href="assets/css/smile-studio.css?v=20260614f" rel="stylesheet" type="text/css"/>
         <link href="assets/css/fonts.css" rel="stylesheet" type="text/css"/>
         <style>
+            /* =====================================================
+               STORY SLIDER — LIQUID GLASS ARROWS + GRADUAL BLUR
+               ===================================================== */
+
+            /* 1. Master Container */
+            .our-story_element {
+                position: relative !important;
+                width: 100% !important;
+                max-width: 1160px !important; 
+                margin-left: auto !important;
+                margin-right: auto !important;
+                overflow: visible !important; 
+            }
+
+            /* 2. The Slider Component (We crop the bleed here) */
+            .story_slider.w-slider {
+                position: relative !important;
+                overflow: hidden !important; 
+                width: 100% !important;
+            }
+
+            /* 3. The Sliding Track */
+            .story-slider_mask.w-slider-mask {
+                overflow: visible !important; 
+            }
+
+            /* 4. Progressive Blur Overlays */
+            .story-slider_blur-left,
+            .story-slider_blur-right {
+                position: absolute !important;
+                top: 0 !important;
+                bottom: 0 !important;
+                width: 180px !important; /* Width matches the blur overlay zone */
+                z-index: 10 !important;
+                pointer-events: none !important; /* Critical: clicks pass through to slider elements */
+            }
+            .story-slider_blur-left {
+                left: 0 !important;
+                background: linear-gradient(to right, #ffffff 15%, rgba(255,255,255,0) 100%) !important;
+            }
+            .story-slider_blur-right {
+                right: 0 !important;
+                background: linear-gradient(to left, #ffffff 15%, rgba(255,255,255,0) 100%) !important;
+            }
+
+            .story-slider_blur-left div,
+            .story-slider_blur-right div {
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+            }
+
+            /* Setup progressive masks and blurs for LEFT side */
+            .story-slider_blur-left .blur-layer-1 {
+                -webkit-mask-image: linear-gradient(to left, transparent 0%, black 12.5%, black 25%, transparent 37.5%);
+                mask-image: linear-gradient(to left, transparent 0%, black 12.5%, black 25%, transparent 37.5%);
+                -webkit-backdrop-filter: blur(0.25rem);
+                backdrop-filter: blur(0.25rem);
+            }
+            .story-slider_blur-left .blur-layer-2 {
+                -webkit-mask-image: linear-gradient(to left, transparent 12.5%, black 25%, black 37.5%, transparent 50%);
+                mask-image: linear-gradient(to left, transparent 12.5%, black 25%, black 37.5%, transparent 50%);
+                -webkit-backdrop-filter: blur(0.375rem);
+                backdrop-filter: blur(0.375rem);
+            }
+            .story-slider_blur-left .blur-layer-3 {
+                -webkit-mask-image: linear-gradient(to left, transparent 25%, black 37.5%, black 50%, transparent 62.5%);
+                mask-image: linear-gradient(to left, transparent 25%, black 37.5%, black 50%, transparent 62.5%);
+                -webkit-backdrop-filter: blur(0.5rem);
+                backdrop-filter: blur(0.5rem);
+            }
+            .story-slider_blur-left .blur-layer-4 {
+                -webkit-mask-image: linear-gradient(to left, transparent 37.5%, black 50%, black 62.5%, transparent 75%);
+                mask-image: linear-gradient(to left, transparent 37.5%, black 50%, black 62.5%, transparent 75%);
+                -webkit-backdrop-filter: blur(0.625rem);
+                backdrop-filter: blur(0.625rem);
+            }
+            .story-slider_blur-left .blur-layer-5 {
+                -webkit-mask-image: linear-gradient(to left, transparent 50%, black 62.5%, black 75%, transparent 87.5%);
+                mask-image: linear-gradient(to left, transparent 50%, black 62.5%, black 75%, transparent 87.5%);
+                -webkit-backdrop-filter: blur(0.75rem);
+                backdrop-filter: blur(0.75rem);
+            }
+            .story-slider_blur-left .blur-layer-6 {
+                -webkit-mask-image: linear-gradient(to left, transparent 62.5%, black 75%, black 87.5%, transparent 100%);
+                mask-image: linear-gradient(to left, transparent 62.5%, black 75%, black 87.5%, transparent 100%);
+                -webkit-backdrop-filter: blur(0.875rem);
+                backdrop-filter: blur(0.875rem);
+            }
+            .story-slider_blur-left .blur-layer-7 {
+                -webkit-mask-image: linear-gradient(to left, transparent 75%, black 87.5%, black 100%);
+                mask-image: linear-gradient(to left, transparent 75%, black 87.5%, black 100%);
+                -webkit-backdrop-filter: blur(1.0rem);
+                backdrop-filter: blur(1.0rem);
+            }
+            .story-slider_blur-left .blur-layer-8 {
+                -webkit-mask-image: linear-gradient(to left, transparent 87.5%, black 100%);
+                mask-image: linear-gradient(to left, transparent 87.5%, black 100%);
+                -webkit-backdrop-filter: blur(1.125rem);
+                backdrop-filter: blur(1.125rem);
+            }
+
+            /* Setup progressive masks and blurs for RIGHT side */
+            .story-slider_blur-right .blur-layer-1 {
+                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12.5%, black 25%, transparent 37.5%);
+                mask-image: linear-gradient(to right, transparent 0%, black 12.5%, black 25%, transparent 37.5%);
+                -webkit-backdrop-filter: blur(0.25rem);
+                backdrop-filter: blur(0.25rem);
+            }
+            .story-slider_blur-right .blur-layer-2 {
+                -webkit-mask-image: linear-gradient(to right, transparent 12.5%, black 25%, black 37.5%, transparent 50%);
+                mask-image: linear-gradient(to right, transparent 12.5%, black 25%, black 37.5%, transparent 50%);
+                -webkit-backdrop-filter: blur(0.375rem);
+                backdrop-filter: blur(0.375rem);
+            }
+            .story-slider_blur-right .blur-layer-3 {
+                -webkit-mask-image: linear-gradient(to right, transparent 25%, black 37.5%, black 50%, transparent 62.5%);
+                mask-image: linear-gradient(to right, transparent 25%, black 37.5%, black 50%, transparent 62.5%);
+                -webkit-backdrop-filter: blur(0.5rem);
+                backdrop-filter: blur(0.5rem);
+            }
+            .story-slider_blur-right .blur-layer-4 {
+                -webkit-mask-image: linear-gradient(to right, transparent 37.5%, black 50%, black 62.5%, transparent 75%);
+                mask-image: linear-gradient(to right, transparent 37.5%, black 50%, black 62.5%, transparent 75%);
+                -webkit-backdrop-filter: blur(0.625rem);
+                backdrop-filter: blur(0.625rem);
+            }
+            .story-slider_blur-right .blur-layer-5 {
+                -webkit-mask-image: linear-gradient(to right, transparent 50%, black 62.5%, black 75%, transparent 87.5%);
+                mask-image: linear-gradient(to right, transparent 50%, black 62.5%, black 75%, transparent 87.5%);
+                -webkit-backdrop-filter: blur(0.75rem);
+                backdrop-filter: blur(0.75rem);
+            }
+            .story-slider_blur-right .blur-layer-6 {
+                -webkit-mask-image: linear-gradient(to right, transparent 62.5%, black 75%, black 87.5%, transparent 100%);
+                mask-image: linear-gradient(to right, transparent 62.5%, black 75%, black 87.5%, transparent 100%);
+                -webkit-backdrop-filter: blur(0.875rem);
+                backdrop-filter: blur(0.875rem);
+            }
+            .story-slider_blur-right .blur-layer-7 {
+                -webkit-mask-image: linear-gradient(to right, transparent 75%, black 87.5%, black 100%);
+                mask-image: linear-gradient(to right, transparent 75%, black 87.5%, black 100%);
+                -webkit-backdrop-filter: blur(1.0rem);
+                backdrop-filter: blur(1.0rem);
+            }
+            .story-slider_blur-right .blur-layer-8 {
+                -webkit-mask-image: linear-gradient(to right, transparent 87.5%, black 100%);
+                mask-image: linear-gradient(to right, transparent 87.5%, black 100%);
+                -webkit-backdrop-filter: blur(1.125rem);
+                backdrop-filter: blur(1.125rem);
+            }
+
+            /* 5. Liquid Glass Arrows */
+            .story-slider_arrow-wrap {
+                inset: auto !important;
+                position: absolute !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                width: 64px !important;
+                height: 64px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: 99 !important; /* Pushes them above the gradient overlays */
+                cursor: pointer !important;
+                pointer-events: auto !important;
+                background: rgba(255,255,255,0.85) !important;
+                border: 1px solid rgba(255,255,255,0.9) !important;
+                border-radius: 50% !important;
+                -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+                backdrop-filter: blur(12px) saturate(180%) !important;
+                box-shadow: 0 8px 32px rgba(13,59,49,0.15), 0 1px 0 rgba(255,255,255,0.9) inset !important;
+                transition: background 0.3s, box-shadow 0.3s, transform 0.3s !important;
+            }
             
+            .story-slider_arrow-wrap:hover {
+                background: rgba(255,255,255,1) !important;
+                box-shadow: 0 12px 40px rgba(13,59,49,0.22), 0 1px 0 rgba(255,255,255,1) inset !important;
+                transform: translateY(-50%) scale(1.08) !important;
+            }
+
+            /* 6. Positioning: 20px INSIDE the container so they are always visible */
+            .w-slider-arrow-left.story-slider_arrow-wrap {
+                left: 20px !important; 
+            }
+            .w-slider-arrow-right.story-slider_arrow-wrap {
+                right: 20px !important; 
+            }
+
+            /* Arrow Icon Color */
+            .story-slider_arrow {
+                width: 22px !important;
+                height: auto !important;
+                color: var(--primary-500, #1a6b5c) !important;
+                position: relative !important;
+                z-index: 100 !important;
+                pointer-events: none !important; 
+            }
         </style>
         <link href="assets/css/fonts.css" rel="stylesheet" type="text/css"/>
         <script type="text/javascript">
@@ -591,6 +788,27 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                    <!-- Gradual Blur Overlays -->
+                                    <div class="story-slider_blur-left">
+                                        <div class="blur-layer-1"></div>
+                                        <div class="blur-layer-2"></div>
+                                        <div class="blur-layer-3"></div>
+                                        <div class="blur-layer-4"></div>
+                                        <div class="blur-layer-5"></div>
+                                        <div class="blur-layer-6"></div>
+                                        <div class="blur-layer-7"></div>
+                                        <div class="blur-layer-8"></div>
+                                    </div>
+                                    <div class="story-slider_blur-right">
+                                        <div class="blur-layer-1"></div>
+                                        <div class="blur-layer-2"></div>
+                                        <div class="blur-layer-3"></div>
+                                        <div class="blur-layer-4"></div>
+                                        <div class="blur-layer-5"></div>
+                                        <div class="blur-layer-6"></div>
+                                        <div class="blur-layer-7"></div>
+                                        <div class="blur-layer-8"></div>
                                     </div>
                                     <div class="story-slider_arrow-wrap w-slider-arrow-left">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 18 12" fill="none" vector-effect="non-scaling-stroke" preserveAspectRatio="none" class="story-slider_arrow">
