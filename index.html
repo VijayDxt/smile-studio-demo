@@ -17,16 +17,21 @@
         <link href="assets/css/fonts.css" rel="stylesheet" type="text/css"/>
         <style>
             /* =====================================================
-               STORY SLIDER — CLEAN CLIP + LIQUID GLASS ARROWS
+               STORY SLIDER — CONTAINED LAYOUT
                ===================================================== */
 
-            /* 1. Clip everything at the container boundary */
+            /* 1. The wrapper holds the slider and gradient overlays.
+                  Limit max-width to match main container and center it.
+                  Hard-clip any bleeding cards. */
             .our-story_element {
                 position: relative;
-                overflow: hidden; /* Hard-clips all cards & bleeds */
+                width: 100%;
+                max-width: 1160px; /* Aligns with main page container */
+                margin: 0 auto;    /* Center the container */
+                overflow: hidden;  /* Cut off cards past the gradient */
             }
 
-            /* 2. Gradient fade overlays — sit INSIDE the clipped wrapper */
+            /* 2. Gradient fade overlays — sit inside the clipped wrapper at the edges */
             .our-story_element::before,
             .our-story_element::after {
                 content: '';
@@ -52,16 +57,15 @@
                     rgba(255,255,255,0) 100%);
             }
 
-            /* 3. Slider: keep its own position context, let mask be full-width */
+            /* 3. Slider itself */
             .story_slider.w-slider {
-                overflow: visible !important; /* needed so arrows aren't hard-clipped by .w-slider */
+                overflow: visible !important;
                 position: relative !important;
             }
 
-            /* 4. Slide mask: full-width and hidden so cards clip cleanly */
+            /* 4. Remove the width:100% mask hack that broke Webflow */
             .story-slider_mask.w-slider-mask {
-                width: 100% !important;
-                overflow: hidden !important;
+                overflow: visible !important; /* Let cards flow side-by-side naturally, clipping is handled by .our-story_element */
             }
 
             /* 5. Liquid glass arrow buttons */
@@ -95,7 +99,7 @@
                 transform: translateY(-50%) scale(1.08) !important;
             }
 
-            /* 6. Arrow positions — inside the slider, sitting in the gradient zone */
+            /* 6. Arrow positions — inside the wrapper, sitting in the gradient zone */
             .w-slider-arrow-left.story-slider_arrow-wrap {
                 left: 20px !important;
             }
