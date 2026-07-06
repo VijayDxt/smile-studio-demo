@@ -17,7 +17,7 @@
         <link href="assets/css/fonts.css" rel="stylesheet" type="text/css"/>
         <style>
             /* =====================================================
-               STORY SLIDER — LIQUID GLASS ARROWS + GRADUAL BLUR
+               STORY SLIDER — LIQUID GLASS ARROWS + GRADUAL BLUR (OUTER VIEWPORT BOUNDS)
                ===================================================== */
 
             /* 1. Master Container */
@@ -30,10 +30,10 @@
                 overflow: visible !important; 
             }
 
-            /* 2. The Slider Component (We crop the bleed here) */
+            /* 2. The Slider Component (We allow overflow to bleed into margins) */
             .story_slider.w-slider {
                 position: relative !important;
-                overflow: hidden !important; 
+                overflow: visible !important; 
                 width: 100% !important;
             }
 
@@ -42,30 +42,57 @@
                 overflow: visible !important; 
             }
 
-            /* 4. Progressive Blur Overlays */
+            /* 4. Progressive Blur Overlays (Extending to the screen margins) */
             .story-slider_blur-left,
             .story-slider_blur-right {
                 position: absolute !important;
                 top: 0 !important;
                 bottom: 0 !important;
-                width: 180px !important; /* Width matches the blur overlay zone */
                 z-index: 10 !important;
                 pointer-events: none !important; /* Critical: clicks pass through to slider elements */
+                display: block !important;
             }
+            
+            /* Left overlay: covers from far left viewport edge up to 40px inside container */
             .story-slider_blur-left {
-                left: 0 !important;
-                background: linear-gradient(to right, #ffffff 15%, rgba(255,255,255,0) 100%) !important;
-            }
-            .story-slider_blur-right {
-                right: 0 !important;
-                background: linear-gradient(to left, #ffffff 15%, rgba(255,255,255,0) 100%) !important;
+                left: -100vw !important;
+                right: calc(100% - 40px) !important;
+                background: linear-gradient(to right, 
+                    #ffffff 0%, 
+                    #ffffff calc(100% - 180px), 
+                    rgba(255,255,255,0.9) calc(100% - 80px), 
+                    rgba(255,255,255,0) 100%
+                ) !important;
             }
 
+            /* Right overlay: covers from 40px inside right container edge to far right viewport edge */
+            .story-slider_blur-right {
+                left: calc(100% - 40px) !important;
+                right: -100vw !important;
+                background: linear-gradient(to left, 
+                    #ffffff 0%, 
+                    #ffffff calc(100% - 180px), 
+                    rgba(255,255,255,0.9) calc(100% - 80px), 
+                    rgba(255,255,255,0) 100%
+                ) !important;
+            }
+
+            /* Confine backdrop-filter blur layers to a transition zone of 220px at the slider edges */
             .story-slider_blur-left div,
             .story-slider_blur-right div {
                 position: absolute;
-                inset: 0;
+                top: 0;
+                bottom: 0;
+                width: 220px;
                 pointer-events: none;
+            }
+            .story-slider_blur-left div {
+                right: 0;
+                left: auto;
+            }
+            .story-slider_blur-right div {
+                left: 0;
+                right: auto;
             }
 
             /* Setup progressive masks and blurs for LEFT side */
@@ -213,6 +240,18 @@
                 position: relative !important;
                 z-index: 100 !important;
                 pointer-events: none !important; 
+            }
+
+            /* Responsive configuration for mobile/tablet */
+            @media (max-width: 1200px) {
+                .story-slider_blur-left,
+                .story-slider_blur-right {
+                    display: none !important;
+                }
+                .story_slider.w-slider,
+                .story-slider_mask.w-slider-mask {
+                    overflow: hidden !important;
+                }
             }
         </style>
         <link href="assets/css/fonts.css" rel="stylesheet" type="text/css"/>
