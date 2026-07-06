@@ -42,15 +42,19 @@
                 overflow: visible !important; 
             }
 
-            /* 4. Progressive Blur Overlays (Extending to the screen margins) */
+            /* 4. Progressive Blur Overlays (Extending to the screen margins and leaking vertically) */
             .story-slider_blur-left,
             .story-slider_blur-right {
                 position: absolute !important;
-                top: 0 !important;
-                bottom: 0 !important;
+                top: -60px !important; /* Leaks 60px above the slider track */
+                bottom: -60px !important; /* Leaks 60px below the slider track */
                 z-index: 10 !important;
                 pointer-events: none !important; /* Critical: clicks pass through to slider elements */
                 display: block !important;
+
+                /* Vertical fade to leak the blur/fade organically at top and bottom */
+                -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%) !important;
+                mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%) !important;
             }
             
             /* Left overlay: covers from far left viewport edge up to 40px inside container */
