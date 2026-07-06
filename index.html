@@ -17,7 +17,7 @@
         <link href="assets/css/fonts.css" rel="stylesheet" type="text/css"/>
         <style>
             /* =====================================================
-               STORY SLIDER — LIQUID GLASS ARROWS + INSIDE-MASK PROGRESSIVE GRADUAL BLUR
+               STORY SLIDER — LIQUID GLASS ARROWS + MULTI-DIRECTIONAL GRADUAL BLUR
                ===================================================== */
 
             /* 1. Master Container */
@@ -30,22 +30,21 @@
                 overflow: visible !important; 
             }
 
-            /* 2. The Slider Component (Allows overflow to render arrows cleanly) */
+            /* 2. The Slider Component */
             .story_slider.w-slider {
                 position: relative !important;
                 overflow: visible !important; 
                 width: 100% !important;
             }
 
-            /* 3. The Sliding Track (Crops cards cleanly at 1160px and isolates compositing context) */
+            /* 3. The Sliding Track (Cards must leak out of the 1160px container) */
             .story-slider_mask.w-slider-mask {
-                overflow: hidden !important;
+                overflow: visible !important;
                 position: relative !important;
                 width: 100% !important;
-                transform: translate3d(0, 0, 0) !important; /* Force a stable render surface */
             }
 
-            /* 4. Progressive Blur Overlays inside mask */
+            /* 4. Progressive Blur Overlays */
             .story-slider_blur-left,
             .story-slider_blur-right,
             .story-slider_blur-bottom {
@@ -55,31 +54,28 @@
                 display: block !important;
             }
             
-            /* Left overlay: covers the left edge transition zone */
+            /* Left overlay: covers the left margin outward from the container edge */
             .story-slider_blur-left {
-                left: 0 !important;
+                left: -100vw !important;
+                right: 100% !important;
                 top: 0 !important;
                 bottom: 0 !important;
-                width: 220px !important;
-                background: linear-gradient(to right, #ffffff 15%, rgba(255,255,255,0) 100%) !important;
             }
 
-            /* Right overlay: covers the right edge transition zone */
+            /* Right overlay: covers the right margin outward from the container edge */
             .story-slider_blur-right {
-                right: 0 !important;
+                left: 100% !important;
+                right: -100vw !important;
                 top: 0 !important;
                 bottom: 0 !important;
-                width: 220px !important;
-                background: linear-gradient(to left, #ffffff 15%, rgba(255,255,255,0) 100%) !important;
             }
 
-            /* Bottom overlay: bleeds card bottom edges vertically */
+            /* Bottom overlay: leaks and bleeds card bottom edges vertically across the whole extended width */
             .story-slider_blur-bottom {
-                left: 0 !important;
-                right: 0 !important;
+                left: -100vw !important;
+                right: -100vw !important;
                 bottom: 0 !important;
-                height: 112px !important; /* 7rem */
-                background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%) !important;
+                height: 7rem !important; /* 112px */
             }
 
             .story-slider_blur-left div,
@@ -837,7 +833,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    <!-- Gradual Blur Overlays inside mask to fix compositing context -->
+                                    </div>
+                                    <!-- Gradual Blur Overlays -->
                                     <div class="story-slider_blur-left">
                                         <div class="blur-layer-1"></div>
                                         <div class="blur-layer-2"></div>
@@ -845,7 +842,6 @@
                                         <div class="blur-layer-4"></div>
                                         <div class="blur-layer-5"></div>
                                         <div class="blur-layer-6"></div>
-                                        <div class="blur-fade-overlay"></div>
                                     </div>
                                     <div class="story-slider_blur-right">
                                         <div class="blur-layer-1"></div>
@@ -854,7 +850,6 @@
                                         <div class="blur-layer-4"></div>
                                         <div class="blur-layer-5"></div>
                                         <div class="blur-layer-6"></div>
-                                        <div class="blur-fade-overlay"></div>
                                     </div>
                                     <div class="story-slider_blur-bottom">
                                         <div class="blur-layer-1"></div>
@@ -863,8 +858,6 @@
                                         <div class="blur-layer-4"></div>
                                         <div class="blur-layer-5"></div>
                                         <div class="blur-layer-6"></div>
-                                        <div class="blur-fade-overlay"></div>
-                                    </div>
                                     </div>
                                     <div class="story-slider_arrow-wrap w-slider-arrow-left">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 18 12" fill="none" vector-effect="non-scaling-stroke" preserveAspectRatio="none" class="story-slider_arrow">
