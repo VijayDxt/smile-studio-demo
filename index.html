@@ -17,7 +17,7 @@
         <link href="assets/css/fonts.css" rel="stylesheet" type="text/css"/>
         <style>
             /* =====================================================
-               STORY SLIDER — LIQUID GLASS ARROWS + MULTI-DIRECTIONAL GRADUAL BLUR
+               STORY SLIDER — LIQUID GLASS ARROWS + INSIDE-MASK PROGRESSIVE GRADUAL BLUR
                ===================================================== */
 
             /* 1. Master Container */
@@ -30,21 +30,22 @@
                 overflow: visible !important; 
             }
 
-            /* 2. The Slider Component (Allow overflow for arrows and top/bottom leaks) */
+            /* 2. The Slider Component (Allows overflow to render arrows cleanly) */
             .story_slider.w-slider {
                 position: relative !important;
                 overflow: visible !important; 
                 width: 100% !important;
             }
 
-            /* 3. The Sliding Track (Crops cards cleanly at 1160px horizontally) */
+            /* 3. The Sliding Track (Crops cards cleanly at 1160px and isolates compositing context) */
             .story-slider_mask.w-slider-mask {
                 overflow: hidden !important;
                 position: relative !important;
                 width: 100% !important;
+                transform: translate3d(0, 0, 0) !important; /* Force a stable render surface */
             }
 
-            /* 4. Progressive Blur Overlays */
+            /* 4. Progressive Blur Overlays inside mask */
             .story-slider_blur-left,
             .story-slider_blur-right,
             .story-slider_blur-bottom {
@@ -72,7 +73,7 @@
                 background: linear-gradient(to left, #ffffff 15%, rgba(255,255,255,0) 100%) !important;
             }
 
-            /* Bottom overlay: leaks and bleeds card bottom edges vertically */
+            /* Bottom overlay: bleeds card bottom edges vertically */
             .story-slider_blur-bottom {
                 left: 0 !important;
                 right: 0 !important;
@@ -836,8 +837,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <!-- Gradual Blur Overlays -->
+                                    <!-- Gradual Blur Overlays inside mask to fix compositing context -->
                                     <div class="story-slider_blur-left">
                                         <div class="blur-layer-1"></div>
                                         <div class="blur-layer-2"></div>
@@ -861,6 +861,7 @@
                                         <div class="blur-layer-4"></div>
                                         <div class="blur-layer-5"></div>
                                         <div class="blur-layer-6"></div>
+                                    </div>
                                     </div>
                                     <div class="story-slider_arrow-wrap w-slider-arrow-left">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 18 12" fill="none" vector-effect="non-scaling-stroke" preserveAspectRatio="none" class="story-slider_arrow">
