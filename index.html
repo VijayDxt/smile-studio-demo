@@ -20,30 +20,34 @@
                STORY SLIDER — GRADIENT FADE + BLUR ON SIDE CARDS
                ===================================================== */
 
-            /* 1. Slider wrapper: position context for pseudo-element overlays */
+            /* 1. Slider wrapper: allow cards to overflow, stay as position context */
             .story_slider.w-slider {
                 position: relative !important;
                 overflow: visible !important;
             }
 
-            /* 2. Left & right gradient fade overlays via pseudo-elements */
-            .story_slider.w-slider::before,
-            .story_slider.w-slider::after {
+            /* 2. Outer element is the true containing wrapper for gradient overlays */
+            .our-story_element {
+                position: relative !important;
+            }
+
+            .our-story_element::before,
+            .our-story_element::after {
                 content: '' !important;
                 position: absolute !important;
                 top: 0 !important;
                 bottom: 0 !important;
                 width: 25% !important;
-                z-index: 2 !important;
+                z-index: 20 !important;
                 pointer-events: none !important;
             }
 
-            .story_slider.w-slider::before {
+            .our-story_element::before {
                 left: 0 !important;
                 background: linear-gradient(to right, #ffffff 0%, transparent 100%) !important;
             }
 
-            .story_slider.w-slider::after {
+            .our-story_element::after {
                 right: 0 !important;
                 background: linear-gradient(to left, #ffffff 0%, transparent 100%) !important;
             }
@@ -105,10 +109,10 @@
                 pointer-events: none !important;
             }
 
-            /* Responsive: hide gradients on mobile/tablet */
+            /* Responsive: hide gradients and blur on mobile/tablet */
             @media (max-width: 1200px) {
-                .story_slider.w-slider::before,
-                .story_slider.w-slider::after {
+                .our-story_element::before,
+                .our-story_element::after {
                     display: none !important;
                 }
                 .story-slider_slide.w-slide {
