@@ -17,190 +17,48 @@
         <link href="assets/css/fonts.css" rel="stylesheet" type="text/css"/>
         <style>
             /* =====================================================
-               STORY SLIDER — LIQUID GLASS ARROWS + MULTI-DIRECTIONAL GRADUAL BLUR
+               STORY SLIDER — GRADIENT FADE + BLUR ON SIDE CARDS
                ===================================================== */
 
-            /* 1. Master Container */
-            .our-story_element {
-                position: relative !important;
-                width: 100% !important;
-                max-width: 1160px !important; 
-                margin-left: auto !important;
-                margin-right: auto !important;
-                overflow: visible !important; 
-            }
-
-            /* 2. The Slider Component */
+            /* 1. Slider wrapper: position context for pseudo-element overlays */
             .story_slider.w-slider {
                 position: relative !important;
-                overflow: visible !important; 
-                width: 100% !important;
-            }
-
-            /* 3. The Sliding Track (Cards must leak out of the 1160px container) */
-            .story-slider_mask.w-slider-mask {
                 overflow: visible !important;
-                position: relative !important;
-                width: 100% !important;
             }
 
-            /* 4. Progressive Blur Overlays */
-            .story-slider_blur-left,
-            .story-slider_blur-right,
-            .story-slider_blur-bottom {
+            /* 2. Left & right gradient fade overlays via pseudo-elements */
+            .story_slider.w-slider::before,
+            .story_slider.w-slider::after {
+                content: '' !important;
                 position: absolute !important;
-                z-index: 10 !important;
-                pointer-events: none !important; /* Critical: clicks pass through to slider elements */
-                display: block !important;
-            }
-            
-            /* Left overlay: covers the left margin outward from the container edge */
-            .story-slider_blur-left {
-                left: -100vw !important;
-                right: 100% !important;
                 top: 0 !important;
                 bottom: 0 !important;
+                width: 25% !important;
+                z-index: 2 !important;
+                pointer-events: none !important;
             }
 
-            /* Right overlay: covers the right margin outward from the container edge */
-            .story-slider_blur-right {
-                left: 100% !important;
-                right: -100vw !important;
-                top: 0 !important;
-                bottom: 0 !important;
+            .story_slider.w-slider::before {
+                left: 0 !important;
+                background: linear-gradient(to right, #ffffff 0%, transparent 100%) !important;
             }
 
-            /* Bottom overlay: leaks and bleeds card bottom edges vertically across the whole extended width */
-            .story-slider_blur-bottom {
-                left: -100vw !important;
-                right: -100vw !important;
-                bottom: 0 !important;
-                height: 7rem !important; /* 112px */
+            .story_slider.w-slider::after {
+                right: 0 !important;
+                background: linear-gradient(to left, #ffffff 0%, transparent 100%) !important;
             }
 
-            .story-slider_blur-left div,
-            .story-slider_blur-right div,
-            .story-slider_blur-bottom div {
-                position: absolute;
-                inset: 0;
-                pointer-events: none;
+            /* 3. Blur on non-active / side slide cards */
+            .story-slider_slide.w-slide {
+                transition: filter 0.4s ease, transform 0.4s ease !important;
+                filter: blur(4px) !important;
             }
 
-            /* LEFT Blur layers: bezier exponential curve */
-            .story-slider_blur-left .blur-layer-1 {
-                -webkit-mask-image: linear-gradient(to left, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
-                mask-image: linear-gradient(to left, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
-                -webkit-backdrop-filter: blur(0.31rem);
-                backdrop-filter: blur(0.31rem);
-            }
-            .story-slider_blur-left .blur-layer-2 {
-                -webkit-mask-image: linear-gradient(to left, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
-                mask-image: linear-gradient(to left, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
-                -webkit-backdrop-filter: blur(0.51rem);
-                backdrop-filter: blur(0.51rem);
-            }
-            .story-slider_blur-left .blur-layer-3 {
-                -webkit-mask-image: linear-gradient(to left, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
-                mask-image: linear-gradient(to left, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
-                -webkit-backdrop-filter: blur(1.0rem);
-                backdrop-filter: blur(1.0rem);
-            }
-            .story-slider_blur-left .blur-layer-4 {
-                -webkit-mask-image: linear-gradient(to left, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
-                mask-image: linear-gradient(to left, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
-                -webkit-backdrop-filter: blur(1.95rem);
-                backdrop-filter: blur(1.95rem);
-            }
-            .story-slider_blur-left .blur-layer-5 {
-                -webkit-mask-image: linear-gradient(to left, transparent 66.7%, black 83.3%, black 100%);
-                mask-image: linear-gradient(to left, transparent 66.7%, black 83.3%, black 100%);
-                -webkit-backdrop-filter: blur(3.26rem);
-                backdrop-filter: blur(3.26rem);
-            }
-            .story-slider_blur-left .blur-layer-6 {
-                -webkit-mask-image: linear-gradient(to left, transparent 83.3%, black 100%);
-                mask-image: linear-gradient(to left, transparent 83.3%, black 100%);
-                -webkit-backdrop-filter: blur(4.0rem);
-                backdrop-filter: blur(4.0rem);
+            .story-slider_slide.w-slide.w-active {
+                filter: blur(0px) !important;
             }
 
-            /* RIGHT Blur layers: bezier exponential curve */
-            .story-slider_blur-right .blur-layer-1 {
-                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
-                mask-image: linear-gradient(to right, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
-                -webkit-backdrop-filter: blur(0.31rem);
-                backdrop-filter: blur(0.31rem);
-            }
-            .story-slider_blur-right .blur-layer-2 {
-                -webkit-mask-image: linear-gradient(to right, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
-                mask-image: linear-gradient(to right, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
-                -webkit-backdrop-filter: blur(0.51rem);
-                backdrop-filter: blur(0.51rem);
-            }
-            .story-slider_blur-right .blur-layer-3 {
-                -webkit-mask-image: linear-gradient(to right, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
-                mask-image: linear-gradient(to right, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
-                -webkit-backdrop-filter: blur(1.0rem);
-                backdrop-filter: blur(1.0rem);
-            }
-            .story-slider_blur-right .blur-layer-4 {
-                -webkit-mask-image: linear-gradient(to right, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
-                mask-image: linear-gradient(to right, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
-                -webkit-backdrop-filter: blur(1.95rem);
-                backdrop-filter: blur(1.95rem);
-            }
-            .story-slider_blur-right .blur-layer-5 {
-                -webkit-mask-image: linear-gradient(to right, transparent 66.7%, black 83.3%, black 100%);
-                mask-image: linear-gradient(to right, transparent 66.7%, black 83.3%, black 100%);
-                -webkit-backdrop-filter: blur(3.26rem);
-                backdrop-filter: blur(3.26rem);
-            }
-            .story-slider_blur-right .blur-layer-6 {
-                -webkit-mask-image: linear-gradient(to right, transparent 83.3%, black 100%);
-                mask-image: linear-gradient(to right, transparent 83.3%, black 100%);
-                -webkit-backdrop-filter: blur(4.0rem);
-                backdrop-filter: blur(4.0rem);
-            }
-
-            /* BOTTOM Blur layers: bezier exponential curve */
-            .story-slider_blur-bottom .blur-layer-1 {
-                -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
-                mask-image: linear-gradient(to bottom, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
-                -webkit-backdrop-filter: blur(0.31rem);
-                backdrop-filter: blur(0.31rem);
-            }
-            .story-slider_blur-bottom .blur-layer-2 {
-                -webkit-mask-image: linear-gradient(to bottom, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
-                mask-image: linear-gradient(to bottom, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
-                -webkit-backdrop-filter: blur(0.51rem);
-                backdrop-filter: blur(0.51rem);
-            }
-            .story-slider_blur-bottom .blur-layer-3 {
-                -webkit-mask-image: linear-gradient(to bottom, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
-                mask-image: linear-gradient(to bottom, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
-                -webkit-backdrop-filter: blur(1.0rem);
-                backdrop-filter: blur(1.0rem);
-            }
-            .story-slider_blur-bottom .blur-layer-4 {
-                -webkit-mask-image: linear-gradient(to bottom, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
-                mask-image: linear-gradient(to bottom, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
-                -webkit-backdrop-filter: blur(1.95rem);
-                backdrop-filter: blur(1.95rem);
-            }
-            .story-slider_blur-bottom .blur-layer-5 {
-                -webkit-mask-image: linear-gradient(to bottom, transparent 66.7%, black 83.3%, black 100%);
-                mask-image: linear-gradient(to bottom, transparent 66.7%, black 83.3%, black 100%);
-                -webkit-backdrop-filter: blur(3.26rem);
-                backdrop-filter: blur(3.26rem);
-            }
-            .story-slider_blur-bottom .blur-layer-6 {
-                -webkit-mask-image: linear-gradient(to bottom, transparent 83.3%, black 100%);
-                mask-image: linear-gradient(to bottom, transparent 83.3%, black 100%);
-                -webkit-backdrop-filter: blur(4.0rem);
-                backdrop-filter: blur(4.0rem);
-            }
-
-            /* 5. Liquid Glass Arrows */
+            /* 4. Liquid Glass Arrows */
             .story-slider_arrow-wrap {
                 inset: auto !important;
                 position: absolute !important;
@@ -211,7 +69,7 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                z-index: 99 !important; /* Pushes them above the gradient overlays */
+                z-index: 99 !important;
                 cursor: pointer !important;
                 pointer-events: auto !important;
                 background: rgba(255,255,255,0.85) !important;
@@ -222,19 +80,19 @@
                 box-shadow: 0 8px 32px rgba(13,59,49,0.15), 0 1px 0 rgba(255,255,255,0.9) inset !important;
                 transition: background 0.3s, box-shadow 0.3s, transform 0.3s !important;
             }
-            
+
             .story-slider_arrow-wrap:hover {
                 background: rgba(255,255,255,1) !important;
                 box-shadow: 0 12px 40px rgba(13,59,49,0.22), 0 1px 0 rgba(255,255,255,1) inset !important;
                 transform: translateY(-50%) scale(1.08) !important;
             }
 
-            /* 6. Positioning: 20px INSIDE the container so they are always visible */
+            /* 5. Arrow positioning */
             .w-slider-arrow-left.story-slider_arrow-wrap {
-                left: 20px !important; 
+                left: 20px !important;
             }
             .w-slider-arrow-right.story-slider_arrow-wrap {
-                right: 20px !important; 
+                right: 20px !important;
             }
 
             /* Arrow Icon Color */
@@ -244,15 +102,17 @@
                 color: var(--primary-500, #1a6b5c) !important;
                 position: relative !important;
                 z-index: 100 !important;
-                pointer-events: none !important; 
+                pointer-events: none !important;
             }
 
-            /* Responsive configuration for mobile/tablet */
+            /* Responsive: hide gradients on mobile/tablet */
             @media (max-width: 1200px) {
-                .story-slider_blur-left,
-                .story-slider_blur-right,
-                .story-slider_blur-bottom {
+                .story_slider.w-slider::before,
+                .story_slider.w-slider::after {
                     display: none !important;
+                }
+                .story-slider_slide.w-slide {
+                    filter: none !important;
                 }
                 .story_slider.w-slider,
                 .story-slider_mask.w-slider-mask {
@@ -833,31 +693,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <!-- Gradual Blur Overlays -->
-                                    <div class="story-slider_blur-left">
-                                        <div class="blur-layer-1"></div>
-                                        <div class="blur-layer-2"></div>
-                                        <div class="blur-layer-3"></div>
-                                        <div class="blur-layer-4"></div>
-                                        <div class="blur-layer-5"></div>
-                                        <div class="blur-layer-6"></div>
-                                    </div>
-                                    <div class="story-slider_blur-right">
-                                        <div class="blur-layer-1"></div>
-                                        <div class="blur-layer-2"></div>
-                                        <div class="blur-layer-3"></div>
-                                        <div class="blur-layer-4"></div>
-                                        <div class="blur-layer-5"></div>
-                                        <div class="blur-layer-6"></div>
-                                    </div>
-                                    <div class="story-slider_blur-bottom">
-                                        <div class="blur-layer-1"></div>
-                                        <div class="blur-layer-2"></div>
-                                        <div class="blur-layer-3"></div>
-                                        <div class="blur-layer-4"></div>
-                                        <div class="blur-layer-5"></div>
-                                        <div class="blur-layer-6"></div>
                                     </div>
                                     <div class="story-slider_arrow-wrap w-slider-arrow-left">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 18 12" fill="none" vector-effect="non-scaling-stroke" preserveAspectRatio="none" class="story-slider_arrow">
