@@ -17,54 +17,196 @@
         <link href="assets/css/fonts.css" rel="stylesheet" type="text/css"/>
         <style>
             /* =====================================================
-               STORY SLIDER — GRADIENT FADE + BLUR ON SIDE CARDS
+               STORY SLIDER — LIQUID GLASS ARROWS + MULTI-DIRECTIONAL GRADUAL BLUR
                ===================================================== */
 
-            /* 1. Slider wrapper: allow cards to overflow, stay as position context */
-            .story_slider.w-slider {
-                position: relative !important;
-                overflow: visible !important;
-            }
-
-            /* 2. Outer element is the true containing wrapper for gradient overlays */
+            /* 1. Master Container */
             .our-story_element {
                 position: relative !important;
+                width: 100% !important;
+                max-width: 1160px !important; 
+                margin-left: auto !important;
+                margin-right: auto !important;
+                overflow: visible !important; 
             }
 
-            .our-story_element::before,
-            .our-story_element::after {
-                content: '' !important;
+            /* 2. Master Wrapper — holds slider track + arrows as siblings so arrows escape overflow:hidden */
+            .story-slider_master {
+                position: relative !important;
+                width: 100% !important;
+            }
+
+            /* 3. The Slider Component — let Webflow manage its own overflow, we don't fight it */
+            .story_slider.w-slider {
+                position: relative !important;
+                width: 100% !important;
+            }
+
+            /* 4a. The Sliding Track — overflow:hidden crops cards at the container boundary */
+            .story-slider_mask.w-slider-mask {
+                overflow: hidden !important;
+                position: relative !important;
+                width: 100% !important;
+            }
+
+            /* 4b. Progressive Blur Overlays — positioned relative to .story-slider_master */
+            .story-slider_blur-left,
+            .story-slider_blur-right,
+            .story-slider_blur-bottom {
                 position: absolute !important;
+                z-index: 10 !important;
+                pointer-events: none !important;
+                display: block !important;
+            }
+            
+            /* Left overlay: bleeds left into the viewport margin */
+            .story-slider_blur-left {
+                left: -100vw !important;
+                right: calc(100% - 60px) !important;
                 top: 0 !important;
                 bottom: 0 !important;
-                width: 25% !important;
-                z-index: 20 !important;
-                pointer-events: none !important;
             }
 
-            .our-story_element::before {
+            /* Right overlay: bleeds right into the viewport margin */
+            .story-slider_blur-right {
+                left: calc(100% - 60px) !important;
+                right: -100vw !important;
+                top: 0 !important;
+                bottom: 0 !important;
+            }
+
+            /* Bottom overlay: spans full width and fades the bottom of the slider */
+            .story-slider_blur-bottom {
                 left: 0 !important;
-                background: linear-gradient(to right, #ffffff 0%, transparent 100%) !important;
-            }
-
-            .our-story_element::after {
                 right: 0 !important;
-                background: linear-gradient(to left, #ffffff 0%, transparent 100%) !important;
+                bottom: 0 !important;
+                height: 7rem !important;
             }
 
-            /* 3. Blur on non-active / side slide cards */
-            .story-slider_slide.w-slide {
-                transition: filter 0.4s ease, transform 0.4s ease !important;
-                filter: blur(4px) !important;
+            .story-slider_blur-left div,
+            .story-slider_blur-right div,
+            .story-slider_blur-bottom div {
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
             }
 
-            .story-slider_slide.w-slide.w-active {
-                filter: blur(0px) !important;
+            /* LEFT Blur layers: bezier exponential curve */
+            .story-slider_blur-left .blur-layer-1 {
+                -webkit-mask-image: linear-gradient(to left, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
+                mask-image: linear-gradient(to left, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
+                -webkit-backdrop-filter: blur(0.31rem);
+                backdrop-filter: blur(0.31rem);
+            }
+            .story-slider_blur-left .blur-layer-2 {
+                -webkit-mask-image: linear-gradient(to left, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
+                mask-image: linear-gradient(to left, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
+                -webkit-backdrop-filter: blur(0.51rem);
+                backdrop-filter: blur(0.51rem);
+            }
+            .story-slider_blur-left .blur-layer-3 {
+                -webkit-mask-image: linear-gradient(to left, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
+                mask-image: linear-gradient(to left, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
+                -webkit-backdrop-filter: blur(1.0rem);
+                backdrop-filter: blur(1.0rem);
+            }
+            .story-slider_blur-left .blur-layer-4 {
+                -webkit-mask-image: linear-gradient(to left, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
+                mask-image: linear-gradient(to left, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
+                -webkit-backdrop-filter: blur(1.95rem);
+                backdrop-filter: blur(1.95rem);
+            }
+            .story-slider_blur-left .blur-layer-5 {
+                -webkit-mask-image: linear-gradient(to left, transparent 66.7%, black 83.3%, black 100%);
+                mask-image: linear-gradient(to left, transparent 66.7%, black 83.3%, black 100%);
+                -webkit-backdrop-filter: blur(3.26rem);
+                backdrop-filter: blur(3.26rem);
+            }
+            .story-slider_blur-left .blur-layer-6 {
+                -webkit-mask-image: linear-gradient(to left, transparent 83.3%, black 100%);
+                mask-image: linear-gradient(to left, transparent 83.3%, black 100%);
+                -webkit-backdrop-filter: blur(4.0rem);
+                backdrop-filter: blur(4.0rem);
             }
 
-            /* 4. Liquid Glass Arrows */
-            .story-slider_arrow-wrap {
-                inset: auto !important;
+            /* RIGHT Blur layers: bezier exponential curve */
+            .story-slider_blur-right .blur-layer-1 {
+                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
+                mask-image: linear-gradient(to right, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
+                -webkit-backdrop-filter: blur(0.31rem);
+                backdrop-filter: blur(0.31rem);
+            }
+            .story-slider_blur-right .blur-layer-2 {
+                -webkit-mask-image: linear-gradient(to right, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
+                mask-image: linear-gradient(to right, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
+                -webkit-backdrop-filter: blur(0.51rem);
+                backdrop-filter: blur(0.51rem);
+            }
+            .story-slider_blur-right .blur-layer-3 {
+                -webkit-mask-image: linear-gradient(to right, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
+                mask-image: linear-gradient(to right, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
+                -webkit-backdrop-filter: blur(1.0rem);
+                backdrop-filter: blur(1.0rem);
+            }
+            .story-slider_blur-right .blur-layer-4 {
+                -webkit-mask-image: linear-gradient(to right, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
+                mask-image: linear-gradient(to right, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
+                -webkit-backdrop-filter: blur(1.95rem);
+                backdrop-filter: blur(1.95rem);
+            }
+            .story-slider_blur-right .blur-layer-5 {
+                -webkit-mask-image: linear-gradient(to right, transparent 66.7%, black 83.3%, black 100%);
+                mask-image: linear-gradient(to right, transparent 66.7%, black 83.3%, black 100%);
+                -webkit-backdrop-filter: blur(3.26rem);
+                backdrop-filter: blur(3.26rem);
+            }
+            .story-slider_blur-right .blur-layer-6 {
+                -webkit-mask-image: linear-gradient(to right, transparent 83.3%, black 100%);
+                mask-image: linear-gradient(to right, transparent 83.3%, black 100%);
+                -webkit-backdrop-filter: blur(4.0rem);
+                backdrop-filter: blur(4.0rem);
+            }
+
+            /* BOTTOM Blur layers: bezier exponential curve */
+            .story-slider_blur-bottom .blur-layer-1 {
+                -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
+                mask-image: linear-gradient(to bottom, transparent 0%, black 16.7%, black 33.3%, transparent 50%);
+                -webkit-backdrop-filter: blur(0.31rem);
+                backdrop-filter: blur(0.31rem);
+            }
+            .story-slider_blur-bottom .blur-layer-2 {
+                -webkit-mask-image: linear-gradient(to bottom, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
+                mask-image: linear-gradient(to bottom, transparent 16.7%, black 33.3%, black 50%, transparent 66.7%);
+                -webkit-backdrop-filter: blur(0.51rem);
+                backdrop-filter: blur(0.51rem);
+            }
+            .story-slider_blur-bottom .blur-layer-3 {
+                -webkit-mask-image: linear-gradient(to bottom, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
+                mask-image: linear-gradient(to bottom, transparent 33.3%, black 50%, black 66.7%, transparent 83.3%);
+                -webkit-backdrop-filter: blur(1.0rem);
+                backdrop-filter: blur(1.0rem);
+            }
+            .story-slider_blur-bottom .blur-layer-4 {
+                -webkit-mask-image: linear-gradient(to bottom, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
+                mask-image: linear-gradient(to bottom, transparent 50%, black 66.7%, black 83.3%, transparent 100%);
+                -webkit-backdrop-filter: blur(1.95rem);
+                backdrop-filter: blur(1.95rem);
+            }
+            .story-slider_blur-bottom .blur-layer-5 {
+                -webkit-mask-image: linear-gradient(to bottom, transparent 66.7%, black 83.3%, black 100%);
+                mask-image: linear-gradient(to bottom, transparent 66.7%, black 83.3%, black 100%);
+                -webkit-backdrop-filter: blur(3.26rem);
+                backdrop-filter: blur(3.26rem);
+            }
+            .story-slider_blur-bottom .blur-layer-6 {
+                -webkit-mask-image: linear-gradient(to bottom, transparent 83.3%, black 100%);
+                mask-image: linear-gradient(to bottom, transparent 83.3%, black 100%);
+                -webkit-backdrop-filter: blur(4.0rem);
+                backdrop-filter: blur(4.0rem);
+            }
+
+            /* 5. Liquid Glass Arrows — positioned relative to .story-slider_master, not the w-slider */
+            .story-slider_master .story-slider_arrow-wrap {
                 position: absolute !important;
                 top: 50% !important;
                 transform: translateY(-50%) !important;
@@ -73,7 +215,7 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                z-index: 99 !important;
+                z-index: 100 !important;
                 cursor: pointer !important;
                 pointer-events: auto !important;
                 background: rgba(255,255,255,0.85) !important;
@@ -84,19 +226,19 @@
                 box-shadow: 0 8px 32px rgba(13,59,49,0.15), 0 1px 0 rgba(255,255,255,0.9) inset !important;
                 transition: background 0.3s, box-shadow 0.3s, transform 0.3s !important;
             }
-
-            .story-slider_arrow-wrap:hover {
+            
+            .story-slider_master .story-slider_arrow-wrap:hover {
                 background: rgba(255,255,255,1) !important;
                 box-shadow: 0 12px 40px rgba(13,59,49,0.22), 0 1px 0 rgba(255,255,255,1) inset !important;
                 transform: translateY(-50%) scale(1.08) !important;
             }
 
-            /* 5. Arrow positioning */
-            .w-slider-arrow-left.story-slider_arrow-wrap {
-                left: 20px !important;
+            /* 6. Arrow positioning — 24px from the slider edges */
+            .story-slider_master .story-slider_arrow-wrap.arrow-left {
+                left: 24px !important;
             }
-            .w-slider-arrow-right.story-slider_arrow-wrap {
-                right: 20px !important;
+            .story-slider_master .story-slider_arrow-wrap.arrow-right {
+                right: 24px !important;
             }
 
             /* Arrow Icon Color */
@@ -106,21 +248,21 @@
                 color: var(--primary-500, #1a6b5c) !important;
                 position: relative !important;
                 z-index: 100 !important;
-                pointer-events: none !important;
+                pointer-events: none !important; 
             }
 
-            /* Responsive: hide gradients and blur on mobile/tablet */
+            /* Hide the native Webflow-generated arrows — we use our custom ones outside the overflow boundary */
+            .story_slider .w-slider-arrow-left,
+            .story_slider .w-slider-arrow-right {
+                display: none !important;
+            }
+
+            /* Responsive configuration for mobile/tablet */
             @media (max-width: 1200px) {
-                .our-story_element::before,
-                .our-story_element::after {
+                .story-slider_blur-left,
+                .story-slider_blur-right,
+                .story-slider_blur-bottom {
                     display: none !important;
-                }
-                .story-slider_slide.w-slide {
-                    filter: none !important;
-                }
-                .story_slider.w-slider,
-                .story-slider_mask.w-slider-mask {
-                    overflow: hidden !important;
                 }
             }
         </style>
@@ -451,6 +593,7 @@
                                 </div>
                             </div>
                             <div data-w-id="50d20822-b82e-29fa-5a00-90a7c3dad777" style="-webkit-transform:translate3d(0, 25%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 25%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 25%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 25%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="our-story_element">
+                                <div class="story-slider_master">
                                 <div data-delay="4000" data-animation="slide" class="story_slider w-slider" data-autoplay="true" data-easing="ease" data-hide-arrows="false" data-disable-swipe="false" data-autoplay-limit="0" data-nav-spacing="3" data-duration="400" data-infinite="true">
                                     <div class="story-slider_mask w-slider-mask">
                                         <div class="story-slider_slide w-slide">
@@ -698,18 +841,45 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="story-slider_arrow-wrap w-slider-arrow-left">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 18 12" fill="none" vector-effect="non-scaling-stroke" preserveAspectRatio="none" class="story-slider_arrow">
-                                            <path d="M17.0608 5.53027L1.48932 5.53031M6.06073 0.530273L1.06077 5.53031L6.06077 10.5303" stroke="currentColor" stroke-width="1.5"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="story-slider_arrow-wrap w-slider-arrow-right">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 18 12" fill="none" vector-effect="non-scaling-stroke" preserveAspectRatio="none" class="story-slider_arrow">
-                                            <path d="M0 5.53027L15.5715 5.53024M11.0001 10.5303L16 5.53023L11 0.530273" stroke="currentColor" stroke-width="1.5"></path>
-                                        </svg>
-                                    </div>
                                     <div class="slide-nav w-slider-nav w-round"></div>
                                 </div>
+                                <!-- Blur overlays and arrows are OUTSIDE the w-slider to escape overflow:hidden -->
+                                <div class="story-slider_blur-left">
+                                    <div class="blur-layer-1"></div>
+                                    <div class="blur-layer-2"></div>
+                                    <div class="blur-layer-3"></div>
+                                    <div class="blur-layer-4"></div>
+                                    <div class="blur-layer-5"></div>
+                                    <div class="blur-layer-6"></div>
+                                </div>
+                                <div class="story-slider_blur-right">
+                                    <div class="blur-layer-1"></div>
+                                    <div class="blur-layer-2"></div>
+                                    <div class="blur-layer-3"></div>
+                                    <div class="blur-layer-4"></div>
+                                    <div class="blur-layer-5"></div>
+                                    <div class="blur-layer-6"></div>
+                                </div>
+                                <div class="story-slider_blur-bottom">
+                                    <div class="blur-layer-1"></div>
+                                    <div class="blur-layer-2"></div>
+                                    <div class="blur-layer-3"></div>
+                                    <div class="blur-layer-4"></div>
+                                    <div class="blur-layer-5"></div>
+                                    <div class="blur-layer-6"></div>
+                                </div>
+                                <!-- Arrows positioned relative to .story-slider_master -->
+                                <div class="story-slider_arrow-wrap arrow-left" role="button" aria-label="Previous slide" onclick="document.querySelector('.story_slider').querySelector('.w-slider-arrow-left').click()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 18 12" fill="none" vector-effect="non-scaling-stroke" preserveAspectRatio="none" class="story-slider_arrow">
+                                        <path d="M17.0608 5.53027L1.48932 5.53031M6.06073 0.530273L1.06077 5.53031L6.06077 10.5303" stroke="currentColor" stroke-width="1.5"></path>
+                                    </svg>
+                                </div>
+                                <div class="story-slider_arrow-wrap arrow-right" role="button" aria-label="Next slide" onclick="document.querySelector('.story_slider').querySelector('.w-slider-arrow-right').click()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 18 12" fill="none" vector-effect="non-scaling-stroke" preserveAspectRatio="none" class="story-slider_arrow">
+                                        <path d="M0 5.53027L15.5715 5.53024M11.0001 10.5303L16 5.53023L11 0.530273" stroke="currentColor" stroke-width="1.5"></path>
+                                    </svg>
+                                </div>
+                                </div><!-- end .story-slider_master -->
                             </div>
                         </div>
                     </div>
