@@ -1997,5 +1997,212 @@
   document.querySelectorAll('img').forEach(bind);
 })();
 </script>
+
+<script>
+/* =====================================================
+   STORY SLIDER — Custom Infinite Loop Engine
+   =====================================================
+   Replaces Webflow's built-in slider for the story section
+   to provide truly seamless infinite looping with cloned
+   slides at both ends. Preserves arrows, dots, autoplay,
+   hover-pause and responsive layout.
+   ===================================================== */
+document.addEventListener("DOMContentLoaded", function() {
+    var oldSlider = document.querySelector('.story_slider');
+    if (!oldSlider) return;
+
+    // Clone slider to strip all Webflow event listeners
+    var newSlider = oldSlider.cloneNode(true);
+    oldSlider.parentNode.replaceChild(newSlider, oldSlider);
+
+    var mask = newSlider.querySelector('.w-slider-mask');
+    if (!mask) return;
+
+    // Remove Webflow's aria-label element if present
+    var ariaEl = mask.querySelector('.w-slider-aria-label');
+    if (ariaEl) ariaEl.remove();
+
+    // Gather original slides
+    var originalSlides = Array.from(mask.querySelectorAll('.w-slide'));
+    var totalOriginal = originalSlides.length;
+    if (totalOriginal < 2) return;
+
+    // Create a flex track wrapper for all slides
+    var track = document.createElement('div');
+    track.className = 'story-slider_track';
+    track.style.cssText = 'display:flex;flex-flow:row nowrap;width:max-content;height:100%;';
+
+    // Move original slides into track, clearing Webflow inline styles
+    originalSlides.forEach(function(s) {
+        s.removeAttribute('style');
+        s.removeAttribute('aria-hidden');
+        s.removeAttribute('role');
+        s.removeAttribute('aria-label');
+        track.appendChild(s);
+    });
+    mask.innerHTML = '';
+    mask.appendChild(track);
+
+    // Override mask styles for our custom engine
+    mask.style.cssText = 'overflow:visible !important;width:100%;height:100%;position:relative;';
+
+    // Clone slides to both ends for seamless looping
+    var numClones = Math.min(3, totalOriginal);
+
+    // Clone last N slides → prepend
+    var lastClones = [];
+    for (var i = totalOriginal - numClones; i < totalOriginal; i++) {
+        var clone = originalSlides[i].cloneNode(true);
+        clone.classList.add('is-clone');
+        lastClones.push(clone);
+    }
+    lastClones.forEach(function(c) {
+        track.insertBefore(c, track.firstChild);
+    });
+
+    // Clone first N slides → append
+    for (var j = 0; j < numClones; j++) {
+        var clone2 = originalSlides[j].cloneNode(true);
+        clone2.classList.add('is-clone');
+        track.appendChild(clone2);
+    }
+
+    // Read slider config from data attributes
+    var duration = parseInt(newSlider.getAttribute('data-duration')) || 400;
+    var delay = parseInt(newSlider.getAttribute('data-delay')) || 4000;
+    var autoplayEnabled = newSlider.getAttribute('data-autoplay') !== 'false';
+
+    var currentIndex = numClones; // Start at first real slide
+    var isTransitioning = false;
+
+    // Calculate step size (slide width + gap)
+    function getStep() {
+        var allSlides = track.querySelectorAll('.w-slide');
+        if (!allSlides.length) return 410;
+        var firstSlide = allSlides[0];
+        var w = firstSlide.offsetWidth;
+        var mr = parseFloat(getComputedStyle(firstSlide).marginRight) || 0;
+        return w + mr;
+    }
+
+    function moveTo(index, animate) {
+        if (animate) {
+            track.style.transition = 'transform ' + duration + 'ms ease';
+        } else {
+            track.style.transition = 'none';
+        }
+        var step = getStep();
+        var offset = -index * step;
+        track.style.transform = 'translateX(' + offset + 'px)';
+        currentIndex = index;
+    }
+
+    // Set initial position (no animation)
+    moveTo(currentIndex, false);
+
+    // Silent boundary reset on transition end
+    track.addEventListener('transitionend', function() {
+        if (currentIndex >= totalOriginal + numClones) {
+            moveTo(currentIndex - totalOriginal, false);
+        } else if (currentIndex < numClones) {
+            moveTo(currentIndex + totalOriginal, false);
+        }
+        updateDots();
+        isTransitioning = false;
+    });
+
+    function next() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+        moveTo(currentIndex + 1, true);
+    }
+
+    function prev() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+        moveTo(currentIndex - 1, true);
+    }
+
+    // Arrow buttons
+    var nextBtn = newSlider.querySelector('.w-slider-arrow-right');
+    var prevBtn = newSlider.querySelector('.w-slider-arrow-left');
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            next();
+            resetAutoplay();
+        });
+    }
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            prev();
+            resetAutoplay();
+        });
+    }
+
+    // Dot navigation
+    var dotsContainer = newSlider.querySelector('.w-slider-nav');
+    var dots = [];
+    if (dotsContainer) {
+        dotsContainer.innerHTML = '';
+        for (var d = 0; d < totalOriginal; d++) {
+            var dot = document.createElement('div');
+            dot.className = 'w-slider-dot';
+            dot.setAttribute('role', 'button');
+            dot.setAttribute('tabindex', '0');
+            dot.setAttribute('aria-label', 'Show slide ' + (d + 1) + ' of ' + totalOriginal);
+            (function(idx) {
+                dot.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (isTransitioning) return;
+                    isTransitioning = true;
+                    moveTo(idx + numClones, true);
+                    resetAutoplay();
+                });
+            })(d);
+            dotsContainer.appendChild(dot);
+            dots.push(dot);
+        }
+    }
+
+    function updateDots() {
+        if (!dots.length) return;
+        dots.forEach(function(d) { d.classList.remove('w-active'); });
+        var activeDotIdx = (currentIndex - numClones) % totalOriginal;
+        if (activeDotIdx < 0) activeDotIdx += totalOriginal;
+        if (dots[activeDotIdx]) dots[activeDotIdx].classList.add('w-active');
+    }
+    updateDots();
+
+    // Autoplay
+    var autoplayInterval;
+    function startAutoplay() {
+        if (!autoplayEnabled) return;
+        autoplayInterval = setInterval(next, delay);
+    }
+    function stopAutoplay() {
+        clearInterval(autoplayInterval);
+    }
+    function resetAutoplay() {
+        stopAutoplay();
+        startAutoplay();
+    }
+    startAutoplay();
+
+    // Pause on hover
+    newSlider.addEventListener('mouseenter', stopAutoplay);
+    newSlider.addEventListener('mouseleave', function() {
+        if (autoplayEnabled) startAutoplay();
+    });
+
+    // Responsive resize
+    window.addEventListener('resize', function() {
+        moveTo(currentIndex, false);
+    });
+});
+</script>
 </body>
 </html>
